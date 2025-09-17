@@ -12,7 +12,7 @@ session = Session()
 
 exchange = ccxt.binance()
 
-top10 = [
+all_symbols = [
     "BTC/USDT", "ETH/USDT", "BNB/USDT", "XRP/USDT", "ADA/USDT",
     "SOL/USDT", "OP/USDT", "TRX/USDT", "DOT/USDT", "MATIC/USDT"
 ]
@@ -23,7 +23,7 @@ num_batches = 20
 
 writer = pd.ExcelWriter("data.xlsx", engine="openpyxl")
 
-for symbol_name in top10:
+for symbol_name in all_symbols:
     print(f"Load {symbol_name} ...")
 
     try:
