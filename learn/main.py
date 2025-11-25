@@ -44,10 +44,21 @@ def load_crypto_data():
 
 def create_target(df: pd.DataFrame) -> pd.DataFrame:
     df = df.sort_values(by="date").reset_index(drop=True)
-    df["close_next"] = df["close"].shift(-1)
-    df["target"] = (df["close_next"] > df["close"]).astype(int)
+
+    df["c1"] = df["close"].shift(2)
+    df["c2"] = df["close"].shift(1)
+    df["c3"] = df["close"]
+    df["c4"] = df["close"].shift(-1)
+
+    up_trend = (df["c3"] > df["c2"]) & (df["c2"] > df["c1"]) & (df["c4"] > df["c3"])
+    down_trend = (df["c3"] < df["c2"]) & (df["c2"] < df["c1"]) & (df["c4"] < df["c3"])
+
+    df["target"] = 0
+    df.loc[up_trend, "target"] = 1
+    df.loc[down_trend, "target"] = -1
     df = df.dropna().reset_index(drop=True)
-    return df.drop(columns=["close_next"])
+
+    return df.drop(columns=["c1", "c2", "c3", "c4"])
 
 
 
@@ -84,7 +95,6 @@ def preprocess_and_save(df: pd.DataFrame):
     joblib.dump(scaler, os.path.join(ARTIFACTS_DIR, "scaler.joblib"))
 
     print("\nComplete!")
-    print(f"Saved: {OUTPUT_FILE}")
     print(f"Scaler: {ARTIFACTS_DIR}/scaler.joblib")
 
 if __name__ == "__main__":
